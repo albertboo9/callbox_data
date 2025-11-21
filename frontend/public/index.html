@@ -2,19 +2,125 @@
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="CallBoxData - Plateforme moderne de collecte de données"
-    />
+    <meta name="theme-color" content="#6366f1" />
+
+    <!-- SEO Essentials -->
+    <title>CallBoxData - Révolutionnez Votre Collecte de Données | Plateforme de Sondage Moderne</title>
+    <meta name="description" content="CallBoxData : La plateforme ultime de collecte de données avec analyses avancées, interface moderne et sécurité garantie. Créez des sondages professionnels, analysez vos données en temps réel." />
+    <meta name="keywords" content="sondage, collecte de données, analytics, plateforme de sondage, enquêtes, data collection, business intelligence, dashboard, reporting, CallBoxData" />
+    <meta name="author" content="CallBoxData" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="language" content="French" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="rating" content="general" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://callboxdata.com/" />
+    <meta property="og:title" content="CallBoxData - Révolutionnez Votre Collecte de Données" />
+    <meta property="og:description" content="Plateforme moderne de sondage avec analyses avancées. Créez des enquêtes professionnelles, collectez des données de qualité et générez des rapports détaillés." />
+    <meta property="og:image" content="%PUBLIC_URL%/Meta.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="CallBoxData - Plateforme de Sondage Moderne" />
+    <meta property="og:site_name" content="CallBoxData" />
+    <meta property="og:locale" content="fr_FR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@callboxdata" />
+    <meta name="twitter:creator" content="@callboxdata" />
+    <meta name="twitter:title" content="CallBoxData - Révolutionnez Votre Collecte de Données" />
+    <meta name="twitter:description" content="Plateforme moderne de sondage avec analyses avancées. Créez des enquêtes professionnelles et collectez des données de qualité." />
+    <meta name="twitter:image" content="%PUBLIC_URL%/Meta.png" />
+    <meta name="twitter:image:alt" content="CallBoxData - Plateforme de Sondage Moderne" />
+
+    <!-- WhatsApp Specific -->
+    <meta property="og:image:secure_url" content="%PUBLIC_URL%/Meta.png" />
+
+    <!-- Additional Meta Tags -->
+    <meta name="application-name" content="CallBoxData" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CallBoxData" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-TileColor" content="#6366f1" />
+    <meta name="msapplication-config" content="%PUBLIC_URL%/browserconfig.xml" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://callboxdata.com/" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <title>CallBoxData</title>
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "CallBoxData",
+      "description": "Plateforme moderne de collecte de données avec analyses avancées pour créer des sondages professionnels",
+      "url": "https://callboxdata.com",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "CallBoxData",
+        "url": "https://callboxdata.com"
+      },
+      "featureList": [
+        "Création de sondages intuitifs",
+        "Analyses de données en temps réel",
+        "Interface responsive",
+        "Sécurité des données",
+        "Exports multiples",
+        "Tableaux de bord personnalisés"
+      ],
+      "screenshot": "%PUBLIC_URL%/Meta.png",
+      "softwareVersion": "1.0.0"
+    }
+    </script>
+
+    <!-- Additional SEO -->
+    <meta name="google-site-verification" content="your-google-verification-code" />
+    <meta name="yandex-verification" content="your-yandex-verification-code" />
+
   </head>
   <body>
-    <noscript>Vous devez activer JavaScript pour utiliser cette application.</noscript>
+    <noscript>
+      <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h1>CallBoxData</h1>
+        <p>Vous devez activer JavaScript pour utiliser cette application moderne de collecte de données.</p>
+        <p>CallBoxData - Révolutionnez votre collecte de données avec des analyses avancées.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
+
+    <!-- Performance and Analytics -->
+    <script>
+      // Remove loading spinner when app loads
+      window.addEventListener('load', function() {
+        const loader = document.querySelector('.app-loading');
+        if (loader) {
+          loader.style.display = 'none';
+        }
+      });
+    </script>
   </body>
 </html>

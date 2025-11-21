@@ -91,13 +91,22 @@ app.use(cors({
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
       'http://localhost:3000',
       'http://127.0.0.1:3000',
-      'http://localhost:3001',
-      'https://callbox-data.vercel.app/'
+      'http://localhost:3001'
     ];
 
+    // Allow Vercel deployments (production and preview)
+    if (origin.includes('vercel.app') ||
+        origin.includes('callboxdata.com') ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+
+    // Check explicit allowed origins
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log('CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },

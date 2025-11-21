@@ -1,25 +1,85 @@
 {
+  "name": "CallBoxData - Révolutionnez Votre Collecte de Données",
   "short_name": "CallBoxData",
-  "name": "CallBoxData - Collecte de Données",
+  "description": "Plateforme moderne de sondage avec analyses avancées. Créez des enquêtes professionnelles, collectez des données de qualité et générez des rapports détaillés.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "fr",
+  "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "type": "image/x-icon",
+      "purpose": "any maskable"
     },
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "Meta.png",
+      "type": "image/png",
+      "sizes": "1200x630",
+      "purpose": "any"
     }
   ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#6366f1",
-  "background_color": "#ffffff"
+  "screenshots": [
+    {
+      "src": "Meta.png",
+      "type": "image/png",
+      "sizes": "1200x630",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Créer un Sondage",
+      "short_name": "Nouveau Sondage",
+      "description": "Créer un nouveau sondage rapidement",
+      "url": "/survey-builder",
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Mes Sondages",
+      "short_name": "Sondages",
+      "description": "Voir tous mes sondages",
+      "url": "/surveys",
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Tableau de Bord",
+      "short_name": "Dashboard",
+      "description": "Accéder au tableau de bord",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
 }

@@ -1,2 +1,50 @@
+# Robots.txt for CallBoxData - Optimized for SEO
+# Allow all crawlers to index the main application
+
 User-agent: *
-Disallow:
+Allow: /
+
+# Allow access to main application routes
+Allow: /survey/
+Allow: /analytics/
+Allow: /dashboard/
+
+# Disallow admin and sensitive routes
+Disallow: /admin
+Disallow: /api/
+Disallow: /static/
+Disallow: /assets/
+
+# Disallow common SPA routes that shouldn't be indexed
+Disallow: /login
+Disallow: /register
+Disallow: /survey-builder
+
+# Allow sitemap (when implemented)
+# Sitemap: https://callboxdata.com/sitemap.xml
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
+
+# Special rules for major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Block unwanted bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
