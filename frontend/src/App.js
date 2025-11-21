@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, Container } from '@mui/material';
 import { AnimatePresence } from 'framer-motion';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import SurveyBuilder from './components/SurveyBuilder';
@@ -21,6 +23,15 @@ function AppContent() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Initialize AOS for scroll animations
+    AOS.init({
+      duration: 800,
+      easing: 'ease-out-cubic',
+      once: true,
+      offset: 50,
+      delay: 100,
+    });
+
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 

@@ -15,10 +15,10 @@ export const useTheme = () => {
 export const ThemeProviderWrapper = ({ children }) => {
   // Valeur du contexte
   const value = {
-    mode: 'dark',
+    mode: 'light',
     theme,
     toggleTheme: () => {}, // Fonction vide pour compatibilité
-    isDark: true,
+    isDark: false,
   };
 
   return (

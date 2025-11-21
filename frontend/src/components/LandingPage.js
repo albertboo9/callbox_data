@@ -6,86 +6,90 @@ import {
   Grid,
   Card,
   CardContent,
+  Button,
   Avatar,
   Chip,
   useTheme,
   useMediaQuery,
-  IconButton,
-  Paper,
+  Fab,
 } from '@mui/material';
-import { motion, useScroll, useTransform, useInView, useAnimation } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart3,
   Users,
   Smartphone,
   Shield,
   Zap,
-  Globe,
   CheckCircle,
   Star,
   ArrowRight,
-  Play,
   TrendingUp,
-  Award,
-  Target,
-  ChevronDown,
-  Sparkles,
-  Cpu,
   Database,
-  Wifi,
-  Lock,
-  Eye,
-  MessageSquare,
-  BarChart,
-  PieChart,
-  Activity,
+  Target,
+  Sparkles,
+  Award,
+  Globe,
+  Play,
+  ChevronDown,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Button from './ui/Button';
-import { showToast } from './ui/Toast';
 
 const LandingPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
   const navigate = useNavigate();
-  const { scrollYProgress } = useScroll();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+  const containerRef = useRef(null);
 
-  // Refs for scroll animations
-  const heroRef = useRef(null);
-  const featuresRef = useRef(null);
-  const statsRef = useRef(null);
-  const testimonialsRef = useRef(null);
-
-  // Scroll transforms
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
-
-  // Mouse tracking for interactive effects
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 20,
-        y: (e.clientY / window.innerHeight - 0.5) * 20,
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  // Using AOS for scroll animations instead of Framer Motion scroll hooks to avoid hydration issues
 
   useEffect(() => {
     setIsLoaded(true);
+
+    // Hide scroll indicator after 5 seconds
+    const timer = setTimeout(() => setShowScrollIndicator(false), 5000);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Animation variants
-  const fadeInUp = {
-    initial: { opacity: 0, y: 60 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }
+  // Advanced animation variants
+  const heroVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 1,
+        staggerChildren: 0.2,
+        delayChildren: 0.3,
+      }
+    }
+  };
+
+  const heroItemVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+        duration: 0.8
+      }
+    }
+  };
+
+  const floatingVariants = {
+    animate: {
+      y: [-10, 10, -10],
+      rotate: [0, 5, 0, -5, 0],
+      transition: {
+        duration: 6,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    }
   };
 
   const staggerContainer = {
@@ -97,140 +101,175 @@ const LandingPage = () => {
     }
   };
 
-  const glowAnimation = {
-    animate: {
-      boxShadow: [
-        '0 0 20px rgba(59, 130, 246, 0.5)',
-        '0 0 40px rgba(59, 130, 246, 0.8)',
-        '0 0 20px rgba(59, 130, 246, 0.5)',
-      ],
-    },
-    transition: {
-      duration: 2,
-      repeat: Infinity,
-      ease: "easeInOut"
+  const cardHoverVariants = {
+    hover: {
+      y: -8,
+      scale: 1.02,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 20
+      }
     }
   };
 
   const features = [
     {
-      icon: <Database size={32} />,
-      title: 'Base de Données Sécurisée',
-      description: 'Stockage cloud avec Firebase, chiffrement de bout en bout et sauvegardes automatiques.',
-      color: '#3b82f6',
-      glowColor: 'rgba(59, 130, 246, 0.3)',
-      delay: 0.1
+      icon: <Database size={24} />,
+      title: 'Stockage Sécurisé',
+      description: 'Base de données cloud avec chiffrement et sauvegardes automatiques.',
     },
     {
-      icon: <Shield size={32} />,
-      title: 'Sécurité Renforcée',
-      description: 'Authentification JWT, autorisations granulaires et protection contre les attaques.',
-      color: '#06b6d4',
-      glowColor: 'rgba(6, 182, 212, 0.3)',
-      delay: 0.2
+      icon: <Shield size={24} />,
+      title: 'Sécurité Avancée',
+      description: 'Authentification sécurisée et protection des données sensibles.',
     },
     {
-      icon: <Smartphone size={32} />,
-      title: 'Mobile First',
-      description: 'Interface optimisée pour tous les appareils avec mode hors ligne intégré.',
-      color: '#10b981',
-      glowColor: 'rgba(16, 185, 129, 0.3)',
-      delay: 0.3
+      icon: <Smartphone size={24} />,
+      title: 'Mobile Optimisé',
+      description: 'Interface adaptée à tous les appareils avec expérience fluide.',
     },
     {
-      icon: <BarChart3 size={32} />,
-      title: 'Analyses Avancées',
-      description: 'Tableaux de bord interactifs avec graphiques en temps réel et exports.',
-      color: '#8b5cf6',
-      glowColor: 'rgba(139, 92, 246, 0.3)',
-      delay: 0.4
+      icon: <BarChart3 size={24} />,
+      title: 'Analyses Détaillées',
+      description: 'Rapports complets et tableaux de bord intuitifs.',
     },
     {
-      icon: <Zap size={32} />,
+      icon: <Zap size={24} />,
       title: 'Performance',
-      description: 'Application ultra-rapide avec cache intelligent et optimisation automatique.',
-      color: '#f59e0b',
-      glowColor: 'rgba(245, 158, 11, 0.3)',
-      delay: 0.5
+      description: 'Application rapide et réactive pour une productivité maximale.',
     },
     {
-      icon: <Globe size={32} />,
-      title: 'API RESTful',
-      description: 'Architecture moderne avec endpoints documentés et SDK disponibles.',
-      color: '#ec4899',
-      glowColor: 'rgba(236, 72, 153, 0.3)',
-      delay: 0.6
+      icon: <Target size={24} />,
+      title: 'Précision',
+      description: 'Collecte de données fiable avec validation en temps réel.',
     }
   ];
 
   const stats = [
-    { value: '10K+', label: 'Utilisateurs actifs', icon: <Users />, color: '#3b82f6' },
-    { value: '500K+', label: 'Sondages créés', icon: <BarChart />, color: '#06b6d4' },
-    { value: '99.9%', label: 'Disponibilité', icon: <Activity />, color: '#10b981' },
-    { value: '4.9/5', label: 'Satisfaction', icon: <Star />, color: '#8b5cf6' }
-  ];
-
-  const testimonials = [
-    {
-      name: 'Marie Dubois',
-      role: 'Directrice Marketing',
-      company: 'TechCorp',
-      avatar: 'MD',
-      content: 'CallBoxData a révolutionné notre façon de collecter les retours clients. L\'interface est intuitive et les analyses sont d\'une précision remarquable.',
-      rating: 5,
-      color: '#3b82f6'
-    },
-    {
-      name: 'Ahmed Benali',
-      role: 'Marchand',
-      company: 'Boutique Locale',
-      avatar: 'AB',
-      content: 'Enfin une solution simple pour collecter les avis de mes clients. Le mode hors ligne est parfait pour mon activité.',
-      rating: 5,
-      color: '#06b6d4'
-    },
-    {
-      name: 'Sophie Martin',
-      role: 'Chef de Projet',
-      company: 'DataInsights',
-      avatar: 'SM',
-      content: 'Les tableaux de bord sont époustouflants. Nous avons gagné un temps considérable dans l\'analyse de nos données.',
-      rating: 5,
-      color: '#10b981'
-    }
+    { value: '10K+', label: 'Utilisateurs actifs' },
+    { value: '500K+', label: 'Sondages créés' },
+    { value: '99.9%', label: 'Disponibilité' },
+    { value: '4.9/5', label: 'Satisfaction client' }
   ];
 
   if (!isLoaded) {
     return (
       <Box sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)',
+        background: theme.custom.gradients.surface,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
+        {/* Animated background elements */}
         <motion.div
           animate={{
             scale: [1, 1.2, 1],
-            opacity: [0.5, 1, 0.5]
+            rotate: [0, 180, 360],
           }}
           transition={{
-            duration: 2,
+            duration: 3,
             repeat: Infinity,
             ease: "easeInOut"
           }}
+          style={{
+            position: 'absolute',
+            width: 200,
+            height: 200,
+            borderRadius: '50%',
+            background: theme.custom.gradients.primary,
+            opacity: 0.1,
+            top: '20%',
+            left: '10%',
+          }}
+        />
+        <motion.div
+          animate={{
+            scale: [1.2, 1, 1.2],
+            rotate: [360, 180, 0],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{
+            position: 'absolute',
+            width: 150,
+            height: 150,
+            borderRadius: '50%',
+            background: theme.custom.gradients.accent,
+            opacity: 0.1,
+            bottom: '20%',
+            right: '10%',
+          }}
+        />
+
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{
+            type: "spring",
+            stiffness: 200,
+            damping: 20,
+            duration: 1
+          }}
         >
           <Box sx={{
-            width: 80,
-            height: 80,
-            borderRadius: '50%',
-            background: 'linear-gradient(45deg, #3b82f6, #06b6d4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 0 30px rgba(59, 130, 246, 0.5)',
+            position: 'relative',
+            zIndex: 1,
           }}>
-            <Sparkles size={32} color="white" />
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+                rotate: [0, 10, -10, 0]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <Box sx={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                background: theme.custom.gradients.primary,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: theme.custom.shadows.colored.primary,
+                mb: 3,
+              }}>
+                <Sparkles size={40} color="white" />
+              </Box>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              <Typography
+                variant="h4"
+                fontWeight={700}
+                color="primary"
+                textAlign="center"
+                sx={{ mb: 2 }}
+              >
+                CallBoxData
+              </Typography>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                textAlign="center"
+              >
+                Chargement de l'expérience...
+              </Typography>
+            </motion.div>
           </Box>
         </motion.div>
       </Box>
@@ -238,909 +277,1188 @@ const LandingPage = () => {
   }
 
   return (
-    <Box sx={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)',
-      color: 'white',
-      overflow: 'hidden',
-      position: 'relative',
-    }}>
+    <Box
+      ref={containerRef}
+      sx={{
+        background: theme.custom.gradients.surface,
+        minHeight: '100vh',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
       {/* Animated Background Elements */}
-      <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
-        {/* Floating particles */}
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 4 + 2,
-              height: Math.random() * 4 + 2,
-              background: `linear-gradient(45deg, ${['#3b82f6', '#06b6d4', '#8b5cf6'][i % 3]}, transparent)`,
-              borderRadius: '50%',
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              x: [0, Math.random() * 20 - 10, 0],
-              opacity: [0.3, 0.8, 0.3],
-            }}
-            transition={{
-              duration: Math.random() * 3 + 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-
-        {/* Grid overlay */}
-        <Box
-          sx={{
+      <div className="absolute inset-0 pointer-events-none">
+        <motion.div
+          animate={{
+            backgroundPosition: ['0% 0%', '100% 100%'],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "linear"
+          }}
+          style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundImage: `
-              linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px',
-            opacity: 0.3,
+            top: '10%',
+            left: '5%',
+            width: '300px',
+            height: '300px',
+            borderRadius: '50%',
+            background: theme.custom.gradients.primary,
+            opacity: 0.05,
+            filter: 'blur(40px)',
           }}
         />
-      </Box>
-
-      {/* Hero Section */}
-      <Box
-        ref={heroRef}
-        sx={{
-          minHeight: '100vh',
-          position: 'relative',
-          zIndex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Hero Background Effects */}
         <motion.div
-          style={{ y, opacity: heroOpacity, scale: heroScale }}
-          className="absolute inset-0"
-        >
-          {/* Main glow orb */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: '20%',
-              right: '10%',
-              width: 400,
-              height: 400,
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)',
-              filter: 'blur(60px)',
-              transform: `translate(${mousePosition.x * 0.5}px, ${mousePosition.y * 0.5}px)`,
-            }}
-          />
+          animate={{
+            backgroundPosition: ['100% 100%', '0% 0%'],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "linear"
+          }}
+          style={{
+            position: 'absolute',
+            bottom: '10%',
+            right: '5%',
+            width: '250px',
+            height: '250px',
+            borderRadius: '50%',
+            background: theme.custom.gradients.accent,
+            opacity: 0.05,
+            filter: 'blur(40px)',
+          }}
+        />
+        <motion.div
+          animate={{
+            rotate: [0, 360],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '400px',
+            height: '400px',
+            borderRadius: '50%',
+            background: theme.custom.gradients.secondary,
+            opacity: 0.03,
+            filter: 'blur(50px)',
+            transform: 'translate(-50%, -50%)',
+          }}
+        />
+      </div>
 
-          {/* Secondary glow orb */}
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: '30%',
-              left: '15%',
-              width: 300,
-              height: 300,
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%)',
-              filter: 'blur(50px)',
-              transform: `translate(${mousePosition.x * -0.3}px, ${mousePosition.y * -0.3}px)`,
-            }}
-          />
-
-          {/* Accent glow orb */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: '60%',
-              right: '30%',
-              width: 200,
-              height: 200,
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, transparent 70%)',
-              filter: 'blur(40px)',
-              transform: `translate(${mousePosition.x * 0.2}px, ${mousePosition.y * 0.2}px)`,
-            }}
-          />
-        </motion.div>
-
-        <Container maxWidth="xl" sx={{ py: 8, position: 'relative', zIndex: 2 }}>
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} lg={6}>
+      {/* Header */}
+      <motion.div
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
+        <Box sx={{
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: 1,
+          borderColor: 'divider',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1100,
+        }}>
+          <Container maxWidth="lg">
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              py: 2,
+            }}>
               <motion.div
-                initial={{ opacity: 0, x: -100 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 1, ease: [0.6, -0.05, 0.01, 0.99] }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {/* Badge */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer' }}
+                  onClick={() => navigate('/')}
                 >
-                  <Chip
-                    label="🚀 Nouvelle Version Disponible"
-                    sx={{
-                      mb: 3,
-                      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(6, 182, 212, 0.2))',
-                      border: '1px solid rgba(59, 130, 246, 0.3)',
-                      color: '#3b82f6',
-                      fontWeight: 600,
-                      backdropFilter: 'blur(10px)',
-                      '& .MuiChip-label': {
-                        fontSize: '0.85rem',
-                      },
-                    }}
-                  />
-                </motion.div>
-
-                {/* Main Title */}
-                <Typography
-                  variant="h1"
-                  sx={{
-                    fontWeight: 900,
-                    mb: 3,
-                    fontSize: { xs: '3rem', md: '4rem', lg: '5rem' },
-                    lineHeight: 1.1,
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #8b5cf6 100%)',
-                    backgroundClip: 'text',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    textShadow: '0 0 40px rgba(59, 130, 246, 0.5)',
-                  }}
-                >
-                  Collectez des Données d'Excellence
-                </Typography>
-
-                {/* Subtitle */}
-                <Typography
-                  variant="h5"
-                  sx={{
-                    mb: 4,
-                    fontWeight: 400,
-                    lineHeight: 1.6,
-                    color: 'rgba(255, 255, 255, 0.8)',
-                    fontSize: { xs: '1.2rem', md: '1.5rem' },
-                  }}
-                >
-                  Révolutionnez votre collecte de données avec CallBoxData.
-                  Interface futuriste, analyses avancées, sécurité maximale.
-                </Typography>
-
-                {/* CTA Buttons */}
-                <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 4 }}>
                   <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    variants={floatingVariants}
+                    animate="animate"
                   >
-                    <Button
-                      variant="gradient"
-                      size="large"
-                      onClick={() => navigate('/login')}
-                      icon={<ArrowRight size={20} />}
-                      sx={{
-                        background: 'linear-gradient(135deg, #3b82f6, #06b6d4)',
-                        boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3)',
-                        border: '1px solid rgba(59, 130, 246, 0.5)',
-                        '&:hover': {
-                          background: 'linear-gradient(135deg, #2563eb, #0891b2)',
-                          boxShadow: '0 12px 40px rgba(59, 130, 246, 0.4)',
-                        },
-                      }}
-                    >
-                      Commencer Maintenant
-                    </Button>
+                    <Box sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 2,
+                      background: theme.custom.gradients.primary,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: theme.custom.shadows.colored.primary,
+                    }}>
+                      <Sparkles size={24} color="white" />
+                    </Box>
                   </motion.div>
-
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button
-                      variant="glass"
-                      size="large"
-                      icon={<Play size={20} />}
-                      sx={{
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        backdropFilter: 'blur(20px)',
-                        '&:hover': {
-                          background: 'rgba(255, 255, 255, 0.1)',
-                          border: '1px solid rgba(59, 130, 246, 0.4)',
-                        },
-                      }}
-                    >
-                      Voir la Démo
-                    </Button>
-                  </motion.div>
-                </Box>
-
-                {/* Social Proof */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    {[...Array(5)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.5 + i * 0.1, duration: 0.3 }}
-                      >
-                        <Star
-                          size={20}
-                          fill="#fbbf24"
-                          color="#fbbf24"
-                          style={{
-                            filter: 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.5))',
-                          }}
-                        />
-                      </motion.div>
-                    ))}
-                  </Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      fontWeight: 500,
-                    }}
-                  >
-                    4.9/5 basé sur 2,500+ avis • 10,000+ utilisateurs actifs
+                  <Typography variant="h6" fontWeight={700} color="primary">
+                    CallBoxData
                   </Typography>
                 </Box>
               </motion.div>
-            </Grid>
 
-            {/* Hero Visual */}
-            <Grid item xs={12} lg={6}>
-              <motion.div
-                initial={{ opacity: 0, x: 100, scale: 0.8 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                transition={{ duration: 1, delay: 0.3, ease: [0.6, -0.05, 0.01, 0.99] }}
-                style={{
-                  transform: `translate(${mousePosition.x * 0.1}px, ${mousePosition.y * 0.1}px)`,
-                }}
-              >
-                <Box
-                  sx={{
-                    position: 'relative',
-                    height: { xs: 400, md: 500, lg: 600 },
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  {/* Main Dashboard Mockup */}
-                  <motion.div
-                    animate={glowAnimation}
-                    style={{
-                      width: '100%',
-                      maxWidth: 400,
-                      height: '90%',
-                      borderRadius: 24,
-                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9))',
-                      border: '1px solid rgba(59, 130, 246, 0.3)',
-                      backdropFilter: 'blur(20px)',
-                      boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
-                      position: 'relative',
-                      overflow: 'hidden',
+                  <Button
+                    variant="text"
+                    onClick={() => navigate('/login')}
+                    sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+                  >
+                    Connexion
+                  </Button>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate('/login')}
+                    size={isMobile ? 'small' : 'medium'}
+                    sx={{
+                      background: theme.custom.gradients.primary,
+                      boxShadow: theme.custom.shadows.colored.primary,
                     }}
                   >
-                    {/* Header */}
-                    <Box sx={{
-                      p: 3,
-                      borderBottom: '1px solid rgba(59, 130, 246, 0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 2,
-                    }}>
-                      <Box sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 2,
-                        background: 'linear-gradient(135deg, #3b82f6, #06b6d4)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                        📊
-                      </Box>
-                      <Box>
-                        <Typography variant="h6" fontWeight={700} sx={{ color: 'white', fontSize: '1.1rem' }}>
-                          CallBoxData
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                          Tableau de bord
-                        </Typography>
-                      </Box>
+                    Commencer
+                  </Button>
+                </motion.div>
+              </Box>
+            </Box>
+          </Container>
+        </Box>
+      </motion.div>
+
+      {/* Hero Section */}
+      <Box sx={{
+        py: { xs: 8, md: 16 },
+        position: 'relative',
+        zIndex: 1,
+      }}>
+        <Container maxWidth="lg">
+          <motion.div
+            variants={heroVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <Grid container spacing={6} alignItems="center">
+              <Grid item xs={12} md={6}>
+                <motion.div variants={heroItemVariants}>
+                  <motion.div
+                    animate={{
+                      backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                    }}
+                    transition={{
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <Typography
+                      variant="h1"
+                      sx={{
+                        mb: 4,
+                        fontWeight: 800,
+                        background: theme.custom.gradients.primary,
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      Collectez des données
+                      <motion.span
+                        animate={{
+                          color: ['#6366f1', '#a855f7', '#f59e0b', '#6366f1'],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                        style={{ display: 'block' }}
+                      >
+                        d'excellence
+                      </motion.span>
+                    </Typography>
+                  </motion.div>
+
+                  <motion.div variants={heroItemVariants}>
+                    <Typography
+                      variant="h5"
+                      color="text.secondary"
+                      sx={{ mb: 6, lineHeight: 1.6, maxWidth: 500 }}
+                    >
+                      Révolutionnez votre collecte de données avec une plateforme moderne,
+                      sécurisée et intuitive. Analyses avancées et expérience mobile optimale.
+                    </Typography>
+                  </motion.div>
+
+                  <motion.div variants={heroItemVariants}>
+                    <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 6 }}>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button
+                          variant="contained"
+                          size="large"
+                          onClick={() => navigate('/login')}
+                          endIcon={<ArrowRight size={20} />}
+                          sx={{
+                            minWidth: 180,
+                            py: 1.5,
+                            px: 4,
+                            background: theme.custom.gradients.primary,
+                            boxShadow: theme.custom.shadows.colored.primary,
+                            fontSize: '1.1rem',
+                            fontWeight: 600,
+                          }}
+                        >
+                          Commencer
+                        </Button>
+                      </motion.div>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button
+                          variant="outlined"
+                          size="large"
+                          sx={{
+                            minWidth: 180,
+                            py: 1.5,
+                            px: 4,
+                            borderWidth: 2,
+                            '&:hover': {
+                              borderWidth: 2,
+                              background: 'rgba(99, 102, 241, 0.05)',
+                            }
+                          }}
+                        >
+                          <Play size={20} style={{ marginRight: 8 }} />
+                          Démo
+                        </Button>
+                      </motion.div>
                     </Box>
+                  </motion.div>
 
-                    {/* Content */}
-                    <Box sx={{ p: 3, height: 'calc(100% - 80px)' }}>
-                      {/* Stats */}
-                      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                        <Box sx={{
-                          flex: 1,
-                          p: 2,
-                          borderRadius: 2,
-                          background: 'rgba(59, 130, 246, 0.1)',
-                          border: '1px solid rgba(59, 130, 246, 0.2)',
-                        }}>
-                          <Typography variant="h4" fontWeight={700} sx={{ color: '#3b82f6' }}>
-                            245
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                            Réponses
-                          </Typography>
-                        </Box>
-                        <Box sx={{
-                          flex: 1,
-                          p: 2,
-                          borderRadius: 2,
-                          background: 'rgba(6, 182, 212, 0.1)',
-                          border: '1px solid rgba(6, 182, 212, 0.2)',
-                        }}>
-                          <Typography variant="h4" fontWeight={700} sx={{ color: '#06b6d4' }}>
-                            78%
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                            Completion
+                  {/* Enhanced Trust indicators */}
+                  <motion.div variants={heroItemVariants}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <motion.div
+                          animate={{ rotate: [0, 10, -10, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                        >
+                          <Award size={24} color={theme.palette.secondary.main} />
+                        </motion.div>
+                        <Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+                            {[...Array(5)].map((_, i) => (
+                              <motion.div
+                                key={i}
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{
+                                  duration: 1,
+                                  repeat: Infinity,
+                                  delay: i * 0.1,
+                                  repeatDelay: 3
+                                }}
+                              >
+                                <Star size={16} fill="#f59e0b" color="#f59e0b" />
+                              </motion.div>
+                            ))}
+                          </Box>
+                          <Typography variant="body2" fontWeight={600}>
+                            4.9/5
                           </Typography>
                         </Box>
                       </Box>
 
-                      {/* Chart Placeholder */}
-                      <Box sx={{
-                        height: 200,
-                        borderRadius: 2,
-                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1))',
-                        border: '1px solid rgba(59, 130, 246, 0.2)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        position: 'relative',
-                      }}>
-                        <BarChart3 size={48} color="#3b82f6" />
-                        <Box sx={{
-                          position: 'absolute',
-                          bottom: 16,
-                          left: 16,
-                          right: 16,
-                          height: 4,
-                          background: 'rgba(59, 130, 246, 0.3)',
-                          borderRadius: 2,
-                        }}>
-                          <motion.div
-                            style={{
-                              height: '100%',
-                              background: 'linear-gradient(90deg, #3b82f6, #06b6d4)',
-                              borderRadius: 2,
-                            }}
-                            animate={{ width: ['0%', '70%', '0%'] }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                          />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <motion.div
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        >
+                          <Globe size={24} color={theme.palette.primary.main} />
+                        </motion.div>
+                        <Box>
+                          <Typography variant="body2" fontWeight={600}>
+                            10K+
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            utilisateurs actifs
+                          </Typography>
                         </Box>
                       </Box>
                     </Box>
                   </motion.div>
+                </motion.div>
+              </Grid>
 
+              <Grid item xs={12} md={6}>
+                <motion.div
+                  variants={heroItemVariants}
+                  style={{ position: 'relative' }}
+                >
                   {/* Floating elements */}
                   <motion.div
                     animate={{
-                      rotate: 360,
-                      scale: [1, 1.1, 1],
+                      y: [-20, 20, -20],
+                      rotate: [0, 5, 0, -5, 0],
                     }}
                     transition={{
-                      rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                      scale: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                      duration: 8,
+                      repeat: Infinity,
+                      ease: "easeInOut"
                     }}
                     style={{
                       position: 'absolute',
-                      top: '10%',
-                      right: '5%',
+                      top: -20,
+                      right: -20,
+                      zIndex: 0,
+                    }}
+                  >
+                    <Box sx={{
                       width: 60,
                       height: 60,
                       borderRadius: '50%',
-                      background: 'linear-gradient(45deg, #8b5cf6, #ec4899)',
-                      opacity: 0.7,
-                    }}
-                  />
+                      background: theme.custom.gradients.accent,
+                      opacity: 0.6,
+                    }} />
+                  </motion.div>
 
                   <motion.div
                     animate={{
-                      y: [0, -20, 0],
-                      opacity: [0.5, 1, 0.5],
+                      y: [20, -20, 20],
+                      x: [-10, 10, -10],
                     }}
                     transition={{
-                      duration: 3,
+                      duration: 6,
                       repeat: Infinity,
                       ease: "easeInOut",
+                      delay: 1,
                     }}
                     style={{
                       position: 'absolute',
-                      bottom: '15%',
-                      left: '10%',
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: 'linear-gradient(45deg, #10b981, #f59e0b)',
-                      opacity: 0.6,
+                      bottom: -30,
+                      left: -30,
+                      zIndex: 0,
                     }}
-                  />
-                </Box>
-              </motion.div>
-            </Grid>
-          </Grid>
+                  >
+                    <Box sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: '50%',
+                      background: theme.custom.gradients.secondary,
+                      opacity: 0.4,
+                    }} />
+                  </motion.div>
 
-          {/* Scroll Indicator */}
+                  <motion.div
+                    whileHover={{ scale: 1.05, rotate: 2 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  >
+                    <Box
+                      sx={{
+                        position: 'relative',
+                        zIndex: 1,
+                        height: { xs: 350, md: 450 },
+                        background: theme.custom.gradients.card,
+                        borderRadius: 4,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: theme.custom.shadows.strong,
+                        border: `1px solid ${theme.palette.divider}`,
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {/* Animated background pattern */}
+                      <motion.div
+                        animate={{
+                          backgroundPosition: ['0% 0%', '100% 100%'],
+                        }}
+                        transition={{
+                          duration: 20,
+                          repeat: Infinity,
+                          repeatType: "reverse",
+                          ease: "linear"
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          opacity: 0.05,
+                          background: `radial-gradient(circle at 20% 80%, ${theme.palette.primary.main}, transparent 50%),
+                                     radial-gradient(circle at 80% 20%, ${theme.palette.accent.main}, transparent 50%),
+                                     radial-gradient(circle at 40% 40%, ${theme.palette.secondary.main}, transparent 50%)`,
+                        }}
+                      />
+
+                      <Box sx={{
+                        width: '90%',
+                        height: '85%',
+                        backgroundColor: 'background.paper',
+                        borderRadius: 3,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        p: 3,
+                        position: 'relative',
+                        zIndex: 1,
+                      }}>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.5, duration: 0.8 }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+                            <motion.div
+                              animate={{ rotate: [0, 10, -10, 0] }}
+                              transition={{ duration: 2, repeat: Infinity, delay: 2 }}
+                            >
+                              <Box sx={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 2,
+                                background: theme.custom.gradients.primary,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
+                                <BarChart3 size={20} color="white" />
+                              </Box>
+                            </motion.div>
+                            <Box>
+                              <Typography variant="h6" fontWeight={700}>
+                                Tableau de bord
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                Analyse en temps réel
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.7, duration: 0.8 }}
+                        >
+                          <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
+                            <motion.div
+                              whileHover={{ scale: 1.05 }}
+                              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                            >
+                              <Box sx={{
+                                flex: 1,
+                                p: 3,
+                                background: theme.custom.gradients.surface,
+                                borderRadius: 2,
+                                textAlign: 'center',
+                                border: `1px solid ${theme.palette.divider}`,
+                              }}>
+                                <motion.div
+                                  animate={{ scale: [1, 1.1, 1] }}
+                                  transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                                >
+                                  <Typography variant="h3" fontWeight={800} color="primary">
+                                    245
+                                  </Typography>
+                                </motion.div>
+                                <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                                  Réponses
+                                </Typography>
+                              </Box>
+                            </motion.div>
+                            <motion.div
+                              whileHover={{ scale: 1.05 }}
+                              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                            >
+                              <Box sx={{
+                                flex: 1,
+                                p: 3,
+                                background: theme.custom.gradients.surface,
+                                borderRadius: 2,
+                                textAlign: 'center',
+                                border: `1px solid ${theme.palette.divider}`,
+                              }}>
+                                <motion.div
+                                  animate={{
+                                    color: ['#22c55e', '#16a34a', '#15803d', '#22c55e'],
+                                  }}
+                                  transition={{ duration: 3, repeat: Infinity }}
+                                >
+                                  <Typography variant="h3" fontWeight={800}>
+                                    78%
+                                  </Typography>
+                                </motion.div>
+                                <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                                  Taux de completion
+                                </Typography>
+                              </Box>
+                            </motion.div>
+                          </Box>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.9, duration: 0.8, type: "spring" }}
+                        >
+                          <Box sx={{
+                            flex: 1,
+                            background: theme.custom.gradients.surface,
+                            borderRadius: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: `1px solid ${theme.palette.divider}`,
+                            position: 'relative',
+                            overflow: 'hidden',
+                          }}>
+                            {/* Animated chart background */}
+                            <motion.div
+                              animate={{
+                                backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
+                              }}
+                              transition={{
+                                duration: 8,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                              style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                opacity: 0.1,
+                                background: `linear-gradient(45deg,
+                                  ${theme.palette.primary.main},
+                                  ${theme.palette.accent.main},
+                                  ${theme.palette.secondary.main},
+                                  ${theme.palette.primary.main})`,
+                                backgroundSize: '400% 400%',
+                              }}
+                            />
+                            <motion.div
+                              animate={{
+                                y: [0, -5, 0],
+                                scale: [1, 1.05, 1],
+                              }}
+                              transition={{
+                                duration: 3,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                            >
+                              <TrendingUp size={64} color={theme.palette.primary.main} />
+                            </motion.div>
+                          </Box>
+                        </motion.div>
+                      </Box>
+                    </Box>
+                  </motion.div>
+                </motion.div>
+              </Grid>
+            </Grid>
+          </motion.div>
+        </Container>
+      </Box>
+
+      {/* Scroll Indicator */}
+      <AnimatePresence>
+        {showScrollIndicator && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2, duration: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ delay: 2, duration: 0.5 }}
             style={{
-              position: 'absolute',
+              position: 'fixed',
               bottom: 40,
               left: '50%',
               transform: 'translateX(-50%)',
+              zIndex: 1000,
             }}
           >
             <motion.div
               animate={{ y: [0, 10, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             >
-              <ChevronDown size={32} color="rgba(59, 130, 246, 0.7)" />
+              <Fab
+                size="small"
+                sx={{
+                  background: theme.custom.gradients.primary,
+                  boxShadow: theme.custom.shadows.colored.primary,
+                  '&:hover': {
+                    background: theme.custom.gradients.primary,
+                  }
+                }}
+              >
+                <ChevronDown size={20} color="white" />
+              </Fab>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Features Section */}
+      <Box
+        sx={{ py: { xs: 10, md: 16 }, backgroundColor: 'background.paper' }}
+        data-aos="fade-up"
+        data-aos-duration="1000"
+      >
+        <Container maxWidth="lg">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <Typography
+              variant="h2"
+              textAlign="center"
+              fontWeight={700}
+              sx={{
+                mb: 4,
+                background: theme.custom.gradients.primary,
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+              data-aos="zoom-in"
+              data-aos-delay="200"
+            >
+              Fonctionnalités puissantes
+            </Typography>
+            <Typography
+              variant="h6"
+              textAlign="center"
+              color="text.secondary"
+              sx={{ mb: 10, maxWidth: 700, mx: 'auto', lineHeight: 1.6 }}
+              data-aos="fade-up"
+              data-aos-delay="400"
+            >
+              Tout ce dont vous avez besoin pour collecter et analyser vos données efficacement
+              avec une expérience utilisateur exceptionnelle
+            </Typography>
+          </motion.div>
+
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+          >
+            <Grid container spacing={4}>
+              {features.map((feature, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <motion.div
+                    variants={cardHoverVariants}
+                    whileHover="hover"
+                    data-aos="fade-up"
+                    data-aos-delay={index * 100}
+                  >
+                    <Card sx={{
+                      height: '100%',
+                      p: 4,
+                      textAlign: 'center',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      background: theme.custom.gradients.card,
+                      border: `1px solid ${theme.palette.divider}`,
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '4px',
+                        background: theme.custom.gradients.primary,
+                        opacity: 0,
+                        transition: 'opacity 0.3s ease',
+                      },
+                      '&:hover::before': {
+                        opacity: 1,
+                      },
+                    }}>
+                      {/* Animated background element */}
+                      <motion.div
+                        animate={{
+                          scale: [1, 1.1, 1],
+                          rotate: [0, 5, -5, 0],
+                        }}
+                        transition={{
+                          duration: 8,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: index * 0.5,
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: -20,
+                          right: -20,
+                          width: 80,
+                          height: 80,
+                          borderRadius: '50%',
+                          background: theme.custom.gradients.primary,
+                          opacity: 0.05,
+                        }}
+                      />
+
+                      <Box sx={{
+                        position: 'relative',
+                        zIndex: 1,
+                      }}>
+                        <motion.div
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                        >
+                          <Box sx={{
+                            width: 80,
+                            height: 80,
+                            borderRadius: 3,
+                            background: theme.custom.gradients.primary,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            mx: 'auto',
+                            mb: 4,
+                            color: 'white',
+                            boxShadow: theme.custom.shadows.colored.primary,
+                          }}>
+                            {feature.icon}
+                          </Box>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.2 + index * 0.1, duration: 0.6 }}
+                        >
+                          <Typography variant="h6" fontWeight={700} sx={{ mb: 3 }}>
+                            {feature.title}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                            {feature.description}
+                          </Typography>
+                        </motion.div>
+                      </Box>
+                    </Card>
+                  </motion.div>
+                </Grid>
+              ))}
+            </Grid>
           </motion.div>
         </Container>
       </Box>
 
       {/* Stats Section */}
       <Box
-        ref={statsRef}
         sx={{
-          py: 8,
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
-          backdropFilter: 'blur(20px)',
-          borderTop: '1px solid rgba(59, 130, 246, 0.1)',
-          borderBottom: '1px solid rgba(59, 130, 246, 0.1)',
+          py: { xs: 10, md: 16 },
+          background: theme.custom.gradients.primary,
+          color: 'white',
+          position: 'relative',
+          overflow: 'hidden',
         }}
+        data-aos="fade-in"
+        data-aos-duration="1500"
       >
-        <Container maxWidth="lg">
+        {/* Animated background elements */}
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          style={{
+            position: 'absolute',
+            top: '20%',
+            left: '10%',
+            width: 200,
+            height: 200,
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.1)',
+            filter: 'blur(40px)',
+          }}
+        />
+        <motion.div
+          animate={{
+            scale: [1.2, 1, 1.2],
+            rotate: [360, 180, 0],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "linear",
+            delay: 2,
+          }}
+          style={{
+            position: 'absolute',
+            bottom: '20%',
+            right: '10%',
+            width: 150,
+            height: 150,
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.1)',
+            filter: 'blur(30px)',
+          }}
+        />
+
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           <motion.div
-            initial="initial"
-            whileInView="animate"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            variants={staggerContainer}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            data-aos="zoom-in"
+            data-aos-delay="200"
           >
-            <Grid container spacing={4}>
-              {stats.map((stat, index) => (
-                <Grid item xs={6} md={3} key={index}>
-                  <motion.div
-                    variants={fadeInUp}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <Box
-                      sx={{
-                        textAlign: 'center',
-                        p: 4,
-                        borderRadius: 4,
-                        background: `linear-gradient(135deg, rgba(${stat.color.slice(1, 3)}, ${stat.color.slice(3, 5)}, ${stat.color.slice(5, 7)}, 0.1), rgba(${stat.color.slice(1, 3)}, ${stat.color.slice(3, 5)}, ${stat.color.slice(5, 7)}, 0.05))`,
-                        border: `1px solid rgba(${stat.color.slice(1, 3)}, ${stat.color.slice(3, 5)}, ${stat.color.slice(5, 7)}, 0.2)`,
-                        backdropFilter: 'blur(10px)',
-                        transition: 'all 0.3s ease',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        '&::before': {
-                          content: '""',
-                          position: 'absolute',
-                          top: 0,
-                          left: '-100%',
-                          width: '100%',
-                          height: '100%',
-                          background: `linear-gradient(90deg, transparent, rgba(${stat.color.slice(1, 3)}, ${stat.color.slice(3, 5)}, ${stat.color.slice(5, 7)}, 0.1), transparent)`,
-                          transition: 'left 0.5s',
-                        },
-                        '&:hover::before': {
-                          left: '100%',
-                        },
+            <Typography
+              variant="h3"
+              textAlign="center"
+              fontWeight={700}
+              sx={{ mb: 2 }}
+            >
+              Chiffres qui comptent
+            </Typography>
+            <Typography
+              variant="h6"
+              textAlign="center"
+              sx={{ mb: 8, opacity: 0.9 }}
+            >
+              La confiance de milliers d'utilisateurs
+            </Typography>
+          </motion.div>
+
+          <Grid container spacing={4}>
+            {stats.map((stat, index) => (
+              <Grid item xs={6} md={3} key={index}>
+                <motion.div
+                  initial={{ opacity: 0, y: 50, scale: 0.5 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    delay: index * 0.2,
+                    duration: 0.8,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 15
+                  }}
+                  data-aos="fade-up"
+                  data-aos-delay={index * 100}
+                  style={{ height: '100%' }}
+                >
+                  <Box sx={{
+                    textAlign: 'center',
+                    p: 3,
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: 3,
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      transform: 'translateY(-5px)',
+                    }
+                  }}>
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.1, 1],
+                        color: ['#ffffff', '#f0f9ff', '#ffffff'],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        delay: index * 0.5,
+                        ease: "easeInOut"
                       }}
                     >
-                      <Box
-                        sx={{
-                          color: stat.color,
-                          mb: 2,
-                          filter: `drop-shadow(0 0 20px ${stat.color}40)`,
-                        }}
-                      >
-                        {stat.icon}
-                      </Box>
                       <Typography
-                        variant="h3"
-                        fontWeight={900}
+                        variant="h2"
+                        fontWeight={800}
                         sx={{
-                          color: 'white',
-                          mb: 1,
-                          textShadow: `0 0 20px ${stat.color}60`,
+                          mb: 2,
+                          fontSize: { xs: '2.5rem', md: '3rem' },
+                          background: 'linear-gradient(135deg, #ffffff, #f0f9ff)',
+                          backgroundClip: 'text',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
                         }}
                       >
                         {stat.value}
                       </Typography>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: 'rgba(255, 255, 255, 0.7)',
-                          fontWeight: 500,
-                        }}
-                      >
-                        {stat.label}
-                      </Typography>
-                    </Box>
-                  </motion.div>
-                </Grid>
-              ))}
-            </Grid>
-          </motion.div>
-        </Container>
-      </Box>
-
-      {/* Features Section */}
-      <Box
-        ref={featuresRef}
-        sx={{
-          py: 12,
-          background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%)',
-        }}
-      >
-        <Container maxWidth="lg">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <Typography
-              variant="h2"
-              textAlign="center"
-              fontWeight={900}
-              sx={{
-                mb: 3,
-                background: 'linear-gradient(135deg, #3b82f6, #06b6d4, #8b5cf6)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textShadow: '0 0 40px rgba(59, 130, 246, 0.5)',
-                fontSize: { xs: '2.5rem', md: '3.5rem' },
-              }}
-            >
-              Fonctionnalités Révolutionnaires
-            </Typography>
-            <Typography
-              variant="h6"
-              textAlign="center"
-              sx={{
-                mb: 8,
-                color: 'rgba(255, 255, 255, 0.7)',
-                maxWidth: 700,
-                mx: 'auto',
-                lineHeight: 1.6,
-                fontSize: { xs: '1.1rem', md: '1.25rem' },
-              }}
-            >
-              Découvrez les outils qui feront de votre collecte de données une expérience futuriste
-            </Typography>
-          </motion.div>
-
-          <motion.div
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <Grid container spacing={4}>
-              {features.map((feature, index) => (
-                <Grid item xs={12} md={6} lg={4} key={index}>
-                  <motion.div
-                    variants={fadeInUp}
-                    whileHover={{
-                      scale: 1.05,
-                      y: -10,
-                      transition: { type: "spring", stiffness: 300 }
-                    }}
-                  >
-                    <Card
+                    </motion.div>
+                    <Typography
+                      variant="body1"
                       sx={{
-                        height: '100%',
-                        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
-                        backdropFilter: 'blur(20px)',
-                        border: `1px solid ${feature.color}30`,
-                        borderRadius: 4,
-                        transition: 'all 0.3s ease',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        '&::before': {
-                          content: '""',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          height: 4,
-                          background: `linear-gradient(90deg, ${feature.color}, ${feature.color}80)`,
-                        },
-                        '&:hover': {
-                          borderColor: feature.color,
-                          boxShadow: `0 20px 40px ${feature.glowColor}`,
-                          transform: 'translateY(-8px)',
-                        },
+                        opacity: 0.9,
+                        fontWeight: 500,
+                        fontSize: { xs: '0.9rem', md: '1rem' }
                       }}
                     >
-                      <CardContent sx={{ p: 4 }}>
-                        <Box
-                          sx={{
-                            width: 72,
-                            height: 72,
-                            borderRadius: 3,
-                            background: `linear-gradient(135deg, ${feature.color}20, ${feature.color}10)`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            mb: 3,
-                            color: feature.color,
-                            filter: `drop-shadow(0 0 20px ${feature.color}40)`,
-                            transition: 'all 0.3s ease',
-                          }}
-                        >
-                          {feature.icon}
-                        </Box>
-
-                        <Typography
-                          variant="h5"
-                          fontWeight={700}
-                          sx={{
-                            mb: 2,
-                            color: 'white',
-                            fontSize: '1.25rem',
-                          }}
-                        >
-                          {feature.title}
-                        </Typography>
-
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            lineHeight: 1.6,
-                            fontSize: '1rem',
-                          }}
-                        >
-                          {feature.description}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </Grid>
-              ))}
-            </Grid>
-          </motion.div>
+                      {stat.label}
+                    </Typography>
+                  </Box>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
         </Container>
       </Box>
 
-      {/* Testimonials Section */}
+      {/* CTA Section */}
       <Box
-        ref={testimonialsRef}
         sx={{
-          py: 12,
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(26, 26, 46, 0.9))',
+          py: { xs: 12, md: 20 },
+          backgroundColor: 'background.default',
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
         }}
+        data-aos="fade-up"
+        data-aos-duration="1000"
       >
-        <Container maxWidth="lg">
+        {/* Floating elements */}
+        <motion.div
+          animate={{
+            y: [-30, 30, -30],
+            x: [-20, 20, -20],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{
+            position: 'absolute',
+            top: '20%',
+            left: '5%',
+            width: 100,
+            height: 100,
+            borderRadius: '50%',
+            background: theme.custom.gradients.primary,
+            opacity: 0.05,
+            filter: 'blur(30px)',
+          }}
+        />
+        <motion.div
+          animate={{
+            y: [30, -30, 30],
+            x: [20, -20, 20],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+          style={{
+            position: 'absolute',
+            bottom: '20%',
+            right: '5%',
+            width: 120,
+            height: 120,
+            borderRadius: '50%',
+            background: theme.custom.gradients.accent,
+            opacity: 0.05,
+            filter: 'blur(40px)',
+          }}
+        />
+
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            data-aos="zoom-in"
+            data-aos-delay="200"
           >
-            <Typography
-              variant="h2"
-              textAlign="center"
-              fontWeight={900}
-              sx={{
-                mb: 3,
-                background: 'linear-gradient(135deg, #3b82f6, #06b6d4)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textShadow: '0 0 40px rgba(59, 130, 246, 0.5)',
-                fontSize: { xs: '2.5rem', md: '3.5rem' },
+            <motion.div
+              animate={{
+                scale: [1, 1.02, 1],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut"
               }}
             >
-              Ils nous font confiance
-            </Typography>
+              <Typography
+                variant="h2"
+                fontWeight={700}
+                sx={{
+                  mb: 4,
+                  background: theme.custom.gradients.primary,
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontSize: { xs: '2.5rem', md: '3.5rem' },
+                  lineHeight: 1.1,
+                }}
+              >
+                Prêt à révolutionner
+                <br />
+                votre collecte de données ?
+              </Typography>
+            </motion.div>
+
             <Typography
               variant="h6"
-              textAlign="center"
+              color="text.secondary"
               sx={{
-                mb: 8,
-                color: 'rgba(255, 255, 255, 0.7)',
+                mb: 6,
                 maxWidth: 600,
                 mx: 'auto',
+                lineHeight: 1.6,
+                fontSize: { xs: '1.1rem', md: '1.25rem' }
               }}
+              data-aos="fade-up"
+              data-aos-delay="400"
             >
-              Découvrez les témoignages de nos utilisateurs satisfaits
+              Rejoignez des milliers d'utilisateurs qui font confiance à CallBoxData
+              pour des analyses de données exceptionnelles
             </Typography>
-          </motion.div>
 
-          <motion.div
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <Grid container spacing={4}>
-              {testimonials.map((testimonial, index) => (
-                <Grid item xs={12} md={4} key={index}>
-                  <motion.div
-                    variants={fadeInUp}
-                    whileHover={{
-                      scale: 1.03,
-                      y: -5,
-                      transition: { type: "spring", stiffness: 300 }
-                    }}
-                  >
-                    <Card
-                      sx={{
-                        height: '100%',
-                        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
-                        backdropFilter: 'blur(20px)',
-                        border: `1px solid ${testimonial.color}30`,
-                        borderRadius: 4,
-                        position: 'relative',
-                        overflow: 'hidden',
-                        '&::before': {
-                          content: '""',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          height: 4,
-                          background: `linear-gradient(90deg, ${testimonial.color}, ${testimonial.color}80)`,
-                        },
-                      }}
-                    >
-                      <CardContent sx={{ p: 4 }}>
-                        <Box sx={{ display: 'flex', mb: 3, gap: 0.5 }}>
-                          {[...Array(testimonial.rating)].map((_, i) => (
-                            <motion.div
-                              key={i}
-                              initial={{ opacity: 0, scale: 0 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: 0.1 * i, duration: 0.3 }}
-                            >
-                              <Star
-                                size={20}
-                                fill="#fbbf24"
-                                color="#fbbf24"
-                                style={{
-                                  filter: 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.5))',
-                                }}
-                              />
-                            </motion.div>
-                          ))}
-                        </Box>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              data-aos="fade-up"
+              data-aos-delay="600"
+            >
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => navigate('/login')}
+                endIcon={<ArrowRight size={24} />}
+                sx={{
+                  minWidth: 250,
+                  py: 2,
+                  px: 6,
+                  fontSize: '1.2rem',
+                  fontWeight: 600,
+                  background: theme.custom.gradients.primary,
+                  boxShadow: theme.custom.shadows.colored.primary,
+                  borderRadius: 3,
+                  '&:hover': {
+                    background: theme.custom.gradients.primary,
+                    boxShadow: theme.custom.shadows.colored.primary,
+                    transform: 'translateY(-2px)',
+                  }
+                }}
+              >
+                Commencer maintenant
+              </Button>
+            </motion.div>
 
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            mb: 4,
-                            fontStyle: 'italic',
-                            lineHeight: 1.6,
-                            color: 'rgba(255, 255, 255, 0.9)',
-                            fontSize: '1rem',
-                          }}
-                        >
-                          "{testimonial.content}"
-                        </Typography>
-
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <Avatar
-                            sx={{
-                              width: 56,
-                              height: 56,
-                              background: `linear-gradient(135deg, ${testimonial.color}, ${testimonial.color}80)`,
-                              fontWeight: 700,
-                              fontSize: '1.2rem',
-                              boxShadow: `0 0 20px ${testimonial.color}40`,
-                            }}
-                          >
-                            {testimonial.avatar}
-                          </Avatar>
-                          <Box>
-                            <Typography
-                              variant="subtitle1"
-                              fontWeight={700}
-                              sx={{ color: 'white', mb: 0.5 }}
-                            >
-                              {testimonial.name}
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              sx={{ color: 'rgba(255, 255, 255, 0.6)' }}
-                            >
-                              {testimonial.role} • {testimonial.company}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </Grid>
-              ))}
-            </Grid>
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 1, duration: 0.8 }}
+              data-aos="fade-in"
+              data-aos-delay="800"
+            >
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 4, fontSize: '0.9rem' }}
+              >
+                ✅ Configuration en 5 minutes • ✅ Support 24/7 • ✅ Sécurité garantie
+              </Typography>
+            </motion.div>
           </motion.div>
         </Container>
       </Box>
 
       {/* Footer */}
-      <Box
-        sx={{
-          py: 6,
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
-          borderTop: '1px solid rgba(59, 130, 246, 0.1)',
-        }}
+      <Box sx={{
+        py: 6,
+        backgroundColor: 'background.paper',
+        borderTop: 1,
+        borderColor: 'divider',
+      }}
+      data-aos="fade-up"
+      data-aos-duration="800"
       >
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center' }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mb: 2,
-              }}
-            >
-              <Box
-                sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 1,
-                  background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(6, 182, 212, 0.8))',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mr: 1,
-                }}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <Box sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 3,
+            }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                📊
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer' }}
+                  onClick={() => navigate('/')}
+                >
+                  <Box sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 2,
+                    background: theme.custom.gradients.primary,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: theme.custom.shadows.colored.primary,
+                  }}>
+                    <Sparkles size={20} color="white" />
+                  </Box>
+                  <Typography variant="h6" fontWeight={700} color="primary">
+                    CallBoxData
+                  </Typography>
+                </Box>
+              </motion.div>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                <Typography variant="body2" color="text.secondary">
+                  Plateforme de sondage moderne
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  © 2024 CallBoxData. Tous droits réservés.
+                </Typography>
               </Box>
-              <Typography variant="h6" fontWeight={700}>
-                CallBoxData
-              </Typography>
             </Box>
-
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              © 2024 CallBoxData. Tous droits réservés. Révolutionnez votre collecte de données.
-            </Typography>
-
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
-                Politique de confidentialité
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
-                Conditions d'utilisation
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
-                Support
-              </Typography>
-            </Box>
-          </Box>
+          </motion.div>
         </Container>
       </Box>
     </Box>
