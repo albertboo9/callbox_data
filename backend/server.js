@@ -91,7 +91,8 @@ app.use(cors({
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
       'http://localhost:3000',
       'http://127.0.0.1:3000',
-      'http://localhost:3001'
+      'http://localhost:3001',
+      'https://callbox-data.vercel.app/'
     ];
 
     if (allowedOrigins.indexOf(origin) !== -1) {

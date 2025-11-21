@@ -80,17 +80,6 @@ const LandingPage = () => {
     }
   };
 
-  const floatingVariants = {
-    animate: {
-      y: [-10, 10, -10],
-      rotate: [0, 5, 0, -5, 0],
-      transition: {
-        duration: 6,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  };
 
   const staggerContainer = {
     animate: {
@@ -358,92 +347,66 @@ const LandingPage = () => {
       </div>
 
       {/* Header */}
-      <motion.div
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      >
-        <Box sx={{
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(20px)',
-          borderBottom: 1,
-          borderColor: 'divider',
-          position: 'sticky',
-          top: 0,
-          zIndex: 1100,
-        }}>
-          <Container maxWidth="lg">
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              py: 2,
-            }}>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Box
-                  sx={{ display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer' }}
-                  onClick={() => navigate('/')}
-                >
-                  <motion.div
-                    variants={floatingVariants}
-                    animate="animate"
-                  >
-                    <Box sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 2,
-                      background: theme.custom.gradients.primary,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: theme.custom.shadows.colored.primary,
-                    }}>
-                      <Sparkles size={24} color="white" />
-                    </Box>
-                  </motion.div>
-                  <Typography variant="h6" fontWeight={700} color="primary">
-                    CallBoxData
-                  </Typography>
-                </Box>
-              </motion.div>
-
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    variant="text"
-                    onClick={() => navigate('/login')}
-                    sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
-                  >
-                    Connexion
-                  </Button>
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate('/login')}
-                    size={isMobile ? 'small' : 'medium'}
-                    sx={{
-                      background: theme.custom.gradients.primary,
-                      boxShadow: theme.custom.shadows.colored.primary,
-                    }}
-                  >
-                    Commencer
-                  </Button>
-                </motion.div>
+      <Box sx={{
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: 1,
+        borderColor: 'divider',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1100,
+      }}>
+        <Container maxWidth="lg">
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            py: 2,
+          }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer' }}
+              onClick={() => navigate('/')}
+            >
+              <Box sx={{
+                width: 40,
+                height: 40,
+                borderRadius: 2,
+                background: theme.custom.gradients.primary,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: theme.custom.shadows.colored.primary,
+              }}>
+                <Sparkles size={24} color="white" />
               </Box>
+              <Typography variant="h6" fontWeight={700} color="primary">
+                CallBoxData
+              </Typography>
             </Box>
-          </Container>
-        </Box>
-      </motion.div>
+
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Button
+                variant="text"
+                onClick={() => navigate('/login')}
+                sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+              >
+                Connexion
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => navigate('/login')}
+                size={isMobile ? 'small' : 'medium'}
+                sx={{
+                  background: theme.custom.gradients.primary,
+                  boxShadow: theme.custom.shadows.colored.primary,
+                }}
+              >
+                Commencer
+              </Button>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
 
       {/* Hero Section */}
       <Box sx={{
