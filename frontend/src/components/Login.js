@@ -71,7 +71,7 @@ const Login = () => {
         ? formData
         : { email: formData.email, password: formData.password };
 
-      const response = await axios.post(`http://localhost:5000/api/auth${endpoint}`, payload);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth${endpoint}`, payload);
 
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));

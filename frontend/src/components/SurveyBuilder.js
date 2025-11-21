@@ -42,7 +42,7 @@ const SurveyBuilder = () => {
   const fetchSurvey = async (surveyId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/api/surveys/${surveyId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/surveys/${surveyId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSurvey(response.data);
@@ -106,7 +106,7 @@ const SurveyBuilder = () => {
     try {
       const token = localStorage.getItem('token');
       const method = id ? 'put' : 'post';
-      const url = id ? `http://localhost:5000/api/surveys/${id}` : 'http://localhost:5000/api/surveys';
+      const url = id ? `${process.env.REACT_APP_API_URL}/surveys/${id}` : `${process.env.REACT_APP_API_URL}/surveys`;
 
       await axios[method](url, survey, {
         headers: { Authorization: `Bearer ${token}` }

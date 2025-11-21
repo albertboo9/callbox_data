@@ -102,7 +102,7 @@ const Dashboard = () => {
 
       // Load surveys for companies/admins
       if (JSON.parse(userData).role !== 'merchant') {
-        const surveysResponse = await axios.get('http://localhost:5000/api/surveys', {
+        const surveysResponse = await axios.get(`${process.env.REACT_APP_API_URL}/surveys`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setSurveys(surveysResponse.data);

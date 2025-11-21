@@ -86,7 +86,37 @@ cd frontend && docker build -t survey-frontend .
 docker run -p 3000:3000 survey-frontend
 ```
 
-## 🔧 Configuration Firebase (Optionnel)
+## 🔧 Configuration des Variables d'Environnement
+
+### Backend (.env)
+Copiez le fichier `.env.example` vers `backend/.env` et configurez les variables :
+
+```bash
+cd backend
+cp .env.example .env
+```
+
+Variables importantes :
+- `NODE_ENV`: Environnement (development/production)
+- `PORT`: Port du serveur (5000 par défaut)
+- `JWT_SECRET`: Clé secrète pour JWT (changez en production)
+- `FIREBASE_PROJECT_ID`: ID du projet Firebase
+- `FIREBASE_PRIVATE_KEY`: Clé privée Firebase (avec \n pour les sauts de ligne)
+- `FIREBASE_CLIENT_EMAIL`: Email du compte de service Firebase
+- `ALLOWED_ORIGINS`: Origines autorisées pour CORS
+
+### Frontend (.env)
+Copiez le fichier `.env.example` vers `frontend/.env` :
+
+```bash
+cd frontend
+cp .env.example .env
+```
+
+Variables importantes :
+- `REACT_APP_API_URL`: URL de l'API backend (http://localhost:5000/api en développement)
+
+### Configuration Firebase (Optionnel)
 
 Pour utiliser Firebase en production :
 
@@ -209,14 +239,46 @@ L'application est responsive et fonctionne sur :
 
 ## 🚀 Déploiement
 
-### Backend
+### Déploiement sur Vercel
+
+#### 1. Frontend (React)
+```bash
+# Installation de Vercel CLI
+npm install -g vercel
+
+# Déploiement du frontend
+cd frontend
+vercel --prod
+```
+
+Dans les paramètres Vercel, ajoutez la variable d'environnement :
+- `REACT_APP_API_URL`: URL de votre backend déployé (ex: `https://your-backend.vercel.app/api`)
+
+#### 2. Backend (Node.js)
+```bash
+# Déploiement du backend
+cd backend
+vercel --prod
+```
+
+Dans les paramètres Vercel, ajoutez les variables d'environnement Firebase :
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_PRIVATE_KEY`
+- `FIREBASE_CLIENT_EMAIL`
+- `FIREBASE_DATABASE_URL`
+- `FIREBASE_STORAGE_BUCKET`
+- `JWT_SECRET`
+- `NODE_ENV=production`
+
+### Déploiement Local
+
+#### Backend
 ```bash
 cd backend
-npm run build  # Si nécessaire
 npm start
 ```
 
-### Frontend
+#### Frontend
 ```bash
 cd frontend
 npm run build

@@ -43,14 +43,22 @@ router.get('/', verifyToken, requireAdminOrCompany, async (req, res) => {
     let surveys;
 
     if (firebaseInitialized) {
-      const surveysSnapshot = await db.collection('surveys')
-        .where('companyId', '==', companyId)
-        .orderBy('createdAt', 'desc')
-        .get();
+      // Get all surveys and filter by companyId in memory to avoid composite index requirement
+      const surveysSnapshot = await db.collection('surveys').get();
 
       surveys = [];
       surveysSnapshot.forEach(doc => {
-        surveys.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+        if (data.companyId === companyId) {
+          surveys.push({ id: doc.id, ...data });
+        }
+      });
+
+      // Sort by createdAt in descending order
+      surveys.sort((a, b) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return dateB - dateA;
       });
     } else {
       surveys = mockDb.getSurveysByCompany(companyId);
@@ -67,20 +75,29 @@ router.get('/', verifyToken, requireAdminOrCompany, async (req, res) => {
 router.get('/:id', verifyToken, async (req, res) => {
   try {
     const surveyId = req.params.id;
-    const surveyDoc = await db.collection('surveys').doc(surveyId).get();
+    let surveyData;
 
-    if (!surveyDoc.exists) {
-      return res.status(404).json({ error: 'Survey not found' });
+    if (firebaseInitialized) {
+      const surveyDoc = await db.collection('surveys').doc(surveyId).get();
+
+      if (!surveyDoc.exists) {
+        return res.status(404).json({ error: 'Survey not found' });
+      }
+
+      surveyData = { id: surveyDoc.id, ...surveyDoc.data() };
+    } else {
+      surveyData = mockDb.getSurveyById(surveyId);
+      if (!surveyData) {
+        return res.status(404).json({ error: 'Survey not found' });
+      }
     }
-
-    const surveyData = surveyDoc.data();
 
     // Check if user has access (company owns it or admin)
     if (req.user.role !== 'admin' && surveyData.companyId !== req.user.uid) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    res.json({ id: surveyDoc.id, ...surveyData });
+    res.json(surveyData);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch survey' });
@@ -93,12 +110,20 @@ router.put('/:id', verifyToken, requireAdminOrCompany, async (req, res) => {
     const surveyId = req.params.id;
     const { title, description, questions, isActive } = req.body;
 
-    const surveyDoc = await db.collection('surveys').doc(surveyId).get();
-    if (!surveyDoc.exists) {
-      return res.status(404).json({ error: 'Survey not found' });
+    let surveyData;
+    if (firebaseInitialized) {
+      const surveyDoc = await db.collection('surveys').doc(surveyId).get();
+      if (!surveyDoc.exists) {
+        return res.status(404).json({ error: 'Survey not found' });
+      }
+      surveyData = surveyDoc.data();
+    } else {
+      surveyData = mockDb.getSurveyById(surveyId);
+      if (!surveyData) {
+        return res.status(404).json({ error: 'Survey not found' });
+      }
     }
 
-    const surveyData = surveyDoc.data();
     if (req.user.role !== 'admin' && surveyData.companyId !== req.user.uid) {
       return res.status(403).json({ error: 'Access denied' });
     }
@@ -111,7 +136,12 @@ router.put('/:id', verifyToken, requireAdminOrCompany, async (req, res) => {
       updatedAt: new Date()
     };
 
-    await db.collection('surveys').doc(surveyId).update(updateData);
+    if (firebaseInitialized) {
+      await db.collection('surveys').doc(surveyId).update(updateData);
+    } else {
+      mockDb.updateSurvey(surveyId, updateData);
+    }
+
     res.json({ id: surveyId, ...updateData });
   } catch (error) {
     console.error(error);
@@ -124,17 +154,30 @@ router.delete('/:id', verifyToken, requireAdminOrCompany, async (req, res) => {
   try {
     const surveyId = req.params.id;
 
-    const surveyDoc = await db.collection('surveys').doc(surveyId).get();
-    if (!surveyDoc.exists) {
-      return res.status(404).json({ error: 'Survey not found' });
+    let surveyData;
+    if (firebaseInitialized) {
+      const surveyDoc = await db.collection('surveys').doc(surveyId).get();
+      if (!surveyDoc.exists) {
+        return res.status(404).json({ error: 'Survey not found' });
+      }
+      surveyData = surveyDoc.data();
+    } else {
+      surveyData = mockDb.getSurveyById(surveyId);
+      if (!surveyData) {
+        return res.status(404).json({ error: 'Survey not found' });
+      }
     }
 
-    const surveyData = surveyDoc.data();
     if (req.user.role !== 'admin' && surveyData.companyId !== req.user.uid) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    await db.collection('surveys').doc(surveyId).delete();
+    if (firebaseInitialized) {
+      await db.collection('surveys').doc(surveyId).delete();
+    } else {
+      mockDb.deleteSurvey(surveyId);
+    }
+
     res.json({ message: 'Survey deleted successfully' });
   } catch (error) {
     console.error(error);
@@ -148,21 +191,28 @@ router.get('/active/list', verifyToken, async (req, res) => {
     let surveys;
 
     if (firebaseInitialized) {
-      const surveysSnapshot = await db.collection('surveys')
-        .where('isActive', '==', true)
-        .orderBy('createdAt', 'desc')
-        .get();
+      // Get all surveys and filter active ones in memory to avoid composite index requirement
+      const surveysSnapshot = await db.collection('surveys').get();
 
       surveys = [];
       surveysSnapshot.forEach(doc => {
         const data = doc.data();
-        surveys.push({
-          id: doc.id,
-          title: data.title,
-          description: data.description,
-          questions: data.questions,
-          companyId: data.companyId
-        });
+        if (data.isActive === true) {
+          surveys.push({
+            id: doc.id,
+            title: data.title,
+            description: data.description,
+            questions: data.questions,
+            companyId: data.companyId
+          });
+        }
+      });
+
+      // Sort by createdAt in descending order
+      surveys.sort((a, b) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return dateB - dateA;
       });
     } else {
       surveys = mockDb.getActiveSurveys().map(survey => ({

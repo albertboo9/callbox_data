@@ -119,15 +119,20 @@ router.get('/my-responses', verifyToken, requireMerchantOrAdmin, async (req, res
   try {
     const merchantId = req.user.uid;
 
-    const responsesSnapshot = await db.collection('responses')
-      .where('merchantId', '==', merchantId)
-      .orderBy('submittedAt', 'desc')
-      .get();
+    let responses;
+    if (firebaseInitialized) {
+      const responsesSnapshot = await db.collection('responses')
+        .where('merchantId', '==', merchantId)
+        .orderBy('submittedAt', 'desc')
+        .get();
 
-    const responses = [];
-    responsesSnapshot.forEach(doc => {
-      responses.push({ id: doc.id, ...doc.data() });
-    });
+      responses = [];
+      responsesSnapshot.forEach(doc => {
+        responses.push({ id: doc.id, ...doc.data() });
+      });
+    } else {
+      responses = mockDb.getResponsesByMerchant(merchantId) || [];
+    }
 
     res.json(responses);
   } catch (error) {

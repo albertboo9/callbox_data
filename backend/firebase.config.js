@@ -1,27 +1,32 @@
 // Firebase configuration
+require('dotenv').config();
 const admin = require('firebase-admin');
 
 // Initialize Firebase Admin SDK
-// Note: You need to download the service account key from Firebase Console
-// and place it as 'firebase-service-account.json' in this directory
-let serviceAccount;
 let firebaseInitialized = false;
 
 try {
-  serviceAccount = require('../backend/serviceAccountKey.json');
-  if (serviceAccount) {
+  if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
+    const serviceAccount = {
+      project_id: process.env.FIREBASE_PROJECT_ID,
+      private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      client_email: process.env.FIREBASE_CLIENT_EMAIL
+    };
+
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
-      // Add your Firebase project config here
-      databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://your-project-id.firebaseio.com',
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'your-project-id.appspot.com'
+      databaseURL: process.env.FIREBASE_DATABASE_URL,
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET
     });
     firebaseInitialized = true;
-    console.log('Firebase initialized successfully');
+    console.log('Firebase initialized successfully with environment variables');
+  } else {
+    console.warn('Firebase environment variables not found. Running in development mode without Firebase.');
+    console.warn('To enable Firebase features, set FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY, and FIREBASE_CLIENT_EMAIL in .env');
   }
 } catch (error) {
-  console.warn('Firebase service account key not found. Running in development mode without Firebase.');
-  console.warn('To enable Firebase features, add firebase-service-account.json');
+  console.warn('Firebase initialization failed. Running in development mode without Firebase.');
+  console.warn('Error:', error.message);
 }
 
 // Mock implementations for development

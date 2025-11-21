@@ -59,8 +59,8 @@ const AdminDashboard = () => {
       // Pour un vrai backoffice, il faudrait des endpoints admin spécifiques
       // Ici on utilise les endpoints existants pour la démonstration
       const [usersRes, surveysRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/auth/me', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('http://localhost:5000/api/surveys', { headers: { Authorization: `Bearer ${token}` } })
+        axios.get(`${process.env.REACT_APP_API_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${process.env.REACT_APP_API_URL}/surveys`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
       // Simulation de données admin (dans un vrai système, ces données viendraient d'endpoints dédiés)
@@ -87,7 +87,7 @@ const AdminDashboard = () => {
   const handleCreateUser = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/auth/register', newUser, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, newUser, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

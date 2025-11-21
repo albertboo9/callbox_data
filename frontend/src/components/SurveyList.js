@@ -40,7 +40,7 @@ const SurveyList = () => {
     try {
       const token = localStorage.getItem('token');
       const endpoint = userData?.role === 'merchant' ? '/active/list' : '/';
-      const response = await axios.get(`http://localhost:5000/api/surveys${endpoint}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/surveys${endpoint}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSurveys(response.data);
@@ -55,7 +55,7 @@ const SurveyList = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/surveys/${surveyId}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/surveys/${surveyId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSurveys(surveys.filter(survey => survey.id !== surveyId));

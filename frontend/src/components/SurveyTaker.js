@@ -51,7 +51,7 @@ const SurveyTaker = () => {
   const fetchSurvey = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/api/surveys/${id}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/surveys/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSurvey(response.data);
@@ -78,7 +78,7 @@ const SurveyTaker = () => {
     const token = localStorage.getItem('token');
     for (const response of pendingResponses) {
       try {
-        await axios.post('http://localhost:5000/api/responses', response, {
+        await axios.post(`${process.env.REACT_APP_API_URL}/responses`, response, {
           headers: { Authorization: `Bearer ${token}` }
         });
       } catch (error) {
@@ -142,7 +142,7 @@ const SurveyTaker = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/responses', responseData, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/responses`, responseData, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

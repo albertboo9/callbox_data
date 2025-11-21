@@ -47,13 +47,13 @@ const Analytics = () => {
       const token = localStorage.getItem('token');
 
       // Fetch survey details
-      const surveyResponse = await axios.get(`http://localhost:5000/api/surveys/${id}`, {
+      const surveyResponse = await axios.get(`${process.env.REACT_APP_API_URL}/surveys/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSurvey(surveyResponse.data);
 
       // Fetch responses
-      const responsesResponse = await axios.get(`http://localhost:5000/api/responses/survey/${id}`, {
+      const responsesResponse = await axios.get(`${process.env.REACT_APP_API_URL}/responses/survey/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setResponses(responsesResponse.data);
