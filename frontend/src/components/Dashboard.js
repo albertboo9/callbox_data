@@ -228,7 +228,7 @@ const Dashboard = () => {
 
   return (
     <Container maxWidth="xl" ref={ref}>
-      <Box sx={{ py: 4 }}>
+      <Box sx={{ py: { xs: 2, md: 4 } }}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -239,13 +239,13 @@ const Dashboard = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            mb: 4,
+            mb: { xs: 2, md: 4 },
             flexWrap: 'wrap',
             gap: 2
           }}>
-            <Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography
-                variant="h3"
+                variant={isMobile ? "h4" : "h3"}
                 component="h1"
                 fontWeight={800}
                 sx={{
@@ -254,19 +254,21 @@ const Dashboard = () => {
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   mb: 1,
+                  fontSize: { xs: '1.75rem', sm: '2.125rem', md: '3rem' },
                 }}
               >
                 Bonjour, {user.name} ! 👋
               </Typography>
-              <Typography variant="h6" color="text.secondary">
+              <Typography variant={isMobile ? "body1" : "h6"} color="text.secondary">
                 Bienvenue sur votre tableau de bord CallBoxData
               </Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexShrink: 0 }}>
               <IconButton
                 onClick={handleRefresh}
                 disabled={refreshing}
+                size={isMobile ? "small" : "medium"}
                 sx={{
                   animation: refreshing ? 'spin 1s linear infinite' : 'none',
                   '@keyframes spin': {
@@ -275,18 +277,88 @@ const Dashboard = () => {
                   },
                 }}
               >
-                <RefreshCw size={20} />
+                <RefreshCw size={isMobile ? 18 : 20} />
               </IconButton>
 
               <Chip
                 label={user.role === 'admin' ? 'Administrateur' :
-                       user.role === 'company' ? 'Entreprise' : 'Marchand'}
+                      user.role === 'company' ? 'Entreprise' : 'Marchand'}
                 color={user.role === 'admin' ? 'error' :
-                       user.role === 'company' ? 'primary' : 'secondary'}
+                      user.role === 'company' ? 'primary' : 'secondary'}
                 variant="outlined"
+                size={isMobile ? "small" : "medium"}
                 sx={{ fontWeight: 600 }}
               />
             </Box>
+          </Box>
+        </motion.div>
+
+        {/* Quick Actions - Moved to top */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Box sx={{ mb: 1, p: { xs: 2, md: 3 }, borderRadius: 3, backgroundColor: 'background.alt' }}>
+            <Typography variant="h6" fontWeight={600} sx={{ mb: { xs: 2, md: 3 } }}>
+              Actions rapides
+            </Typography>
+
+            <Grid container spacing={2}>
+              {(user.role === 'company' || user.role === 'admin') && (
+                <>
+                  <Grid item xs={6} sm={3}>
+                    <Button
+                      variant="gradient"
+                      size="large"
+                      onClick={() => navigate('/survey-builder')}
+                      icon={<Plus size={20} />}
+                      fullWidth
+                    >
+                      Nouveau Sondage
+                    </Button>
+                  </Grid>
+
+                  <Grid item xs={6} sm={3}>
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      onClick={() => navigate('/surveys')}
+                      icon={<Eye size={20} />}
+                      fullWidth
+                    >
+                      Voir Sondages
+                    </Button>
+                  </Grid>
+                </>
+              )}
+
+              {user.role === 'merchant' && (
+                <Grid item xs={6} sm={3}>
+                  <Button
+                    variant="gradient"
+                    size="large"
+                    onClick={() => navigate('/surveys')}
+                    icon={<FileText size={20} />}
+                    fullWidth
+                  >
+                    Sondages Disponibles
+                  </Button>
+                </Grid>
+              )}
+
+              <Grid item xs={6} sm={3}>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={handleLogout}
+                  icon={<Settings size={20} />}
+                  fullWidth
+                >
+                  Déconnexion
+                </Button>
+              </Grid>
+            </Grid>
           </Box>
         </motion.div>
 
@@ -296,12 +368,12 @@ const Dashboard = () => {
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
-          <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid container spacing={2} sx={{ mb: 1 }}>
             {stats && [
               {
                 title: 'Total Sondages',
                 value: stats.totalSurveys,
-                icon: <FileText size={24} />,
+                icon: <FileText size={isMobile ? 20 : 24} />,
                 color: theme.palette.primary.main,
                 change: '+12%',
                 changeType: 'positive'
@@ -309,7 +381,7 @@ const Dashboard = () => {
               {
                 title: 'Sondages Actifs',
                 value: stats.activeSurveys,
-                icon: <Activity size={24} />,
+                icon: <Activity size={isMobile ? 20 : 24} />,
                 color: theme.palette.success.main,
                 change: '+8%',
                 changeType: 'positive'
@@ -317,7 +389,7 @@ const Dashboard = () => {
               {
                 title: 'Total Réponses',
                 value: stats.totalResponses,
-                icon: <Users size={24} />,
+                icon: <Users size={isMobile ? 20 : 24} />,
                 color: theme.palette.secondary.main,
                 change: '+23%',
                 changeType: 'positive'
@@ -325,36 +397,37 @@ const Dashboard = () => {
               {
                 title: 'Taux Completion',
                 value: `${stats.completionRate}%`,
-                icon: <Target size={24} />,
+                icon: <Target size={isMobile ? 20 : 24} />,
                 color: theme.palette.info.main,
                 change: '+5%',
                 changeType: 'positive'
               },
             ].map((stat, index) => (
-              <Grid item xs={12} sm={6} lg={3} key={index}>
+              <Grid item xs={6} sm={6} lg={3} key={index}>
                 <motion.div variants={itemVariants}>
                   <Card
                     sx={{
                       position: 'relative',
                       overflow: 'hidden',
+                      height: '100%',
                       '&::before': {
                         content: '""',
                         position: 'absolute',
                         top: 0,
                         right: 0,
-                        width: 100,
-                        height: 100,
+                        width: { xs: 60, md: 100 },
+                        height: { xs: 60, md: 100 },
                         background: `linear-gradient(135deg, ${stat.color}20, ${stat.color}10)`,
                         borderRadius: '50%',
-                        transform: 'translate(30px, -30px)',
+                        transform: 'translate(20px, -20px)',
                       },
                     }}
                   >
-                    <CardContent sx={{ p: 3 }}>
+                    <CardContent sx={{ p: { xs: 2, md: 3 }, height: '100%', display: 'flex', flexDirection: 'column' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                         <Box
                           sx={{
-                            p: 1.5,
+                            p: { xs: 1, md: 1.5 },
                             borderRadius: 2,
                             background: `linear-gradient(135deg, ${stat.color}15, ${stat.color}10)`,
                             color: stat.color,
@@ -370,18 +443,19 @@ const Dashboard = () => {
                             display: 'flex',
                             alignItems: 'center',
                             gap: 0.5,
+                            fontSize: { xs: '0.75rem', md: '0.875rem' },
                           }}
                         >
-                          <TrendingUp size={14} />
+                          <TrendingUp size={12} />
                           {stat.change}
                         </Typography>
                       </Box>
 
-                      <Typography variant="h3" fontWeight={700} sx={{ mb: 1 }}>
+                      <Typography variant={isMobile ? "h4" : "h3"} fontWeight={700} sx={{ mb: 1, flex: 1 }}>
                         {stat.value}
                       </Typography>
 
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
                         {stat.title}
                       </Typography>
                     </CardContent>
@@ -393,7 +467,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Main Content */}
-        <Grid container spacing={3}>
+        <Grid container spacing={1}>
           {/* Charts Section */}
           {(user.role === 'company' || user.role === 'admin') && (
             <>
@@ -404,7 +478,7 @@ const Dashboard = () => {
                   transition={{ delay: 0.3 }}
                 >
                   <Card>
-                    <CardContent sx={{ p: 3 }}>
+                    <CardContent sx={{ p: { xs: 2, md: 3 } }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                         <Typography variant="h6" fontWeight={600}>
                           Évolution des réponses
@@ -416,8 +490,48 @@ const Dashboard = () => {
                           variant="outlined"
                         />
                       </Box>
-                      <Box sx={{ height: 300 }}>
-                        <Bar data={chartData} options={chartOptions} />
+                      <Box sx={{
+                        height: { xs: 280, md: 320 },
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <Bar data={chartData} options={{
+                          ...chartOptions,
+                          maintainAspectRatio: false,
+                          responsive: true,
+                          plugins: {
+                            ...chartOptions.plugins,
+                            legend: {
+                              ...chartOptions.plugins.legend,
+                              position: 'top',
+                              labels: {
+                                boxWidth: 12,
+                                font: {
+                                  size: isMobile ? 12 : 14
+                                }
+                              }
+                            }
+                          },
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              ticks: {
+                                font: {
+                                  size: isMobile ? 11 : 12
+                                }
+                              }
+                            },
+                            x: {
+                              ticks: {
+                                font: {
+                                  size: isMobile ? 11 : 12
+                                }
+                              }
+                            }
+                          }
+                        }} />
                       </Box>
                     </CardContent>
                   </Card>
@@ -431,12 +545,33 @@ const Dashboard = () => {
                   transition={{ delay: 0.4 }}
                 >
                   <Card>
-                    <CardContent sx={{ p: 3 }}>
+                    <CardContent sx={{ p: { xs: 2, md: 3 } }}>
                       <Typography variant="h6" fontWeight={600} sx={{ mb: 3 }}>
                         Répartition des statuts
                       </Typography>
-                      <Box sx={{ height: 200, display: 'flex', justifyContent: 'center' }}>
-                        <Doughnut data={doughnutData} />
+                      <Box sx={{
+                        height: { xs: 280, md: 320 },
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                      }}>
+                        <Doughnut data={doughnutData} options={{
+                          maintainAspectRatio: false,
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              position: 'bottom',
+                              labels: {
+                                boxWidth: 12,
+                                font: {
+                                  size: isMobile ? 12 : 14
+                                },
+                                padding: 15
+                              }
+                            }
+                          }
+                        }} />
                       </Box>
                     </CardContent>
                   </Card>
@@ -598,74 +733,6 @@ const Dashboard = () => {
           </Grid>
         </Grid>
 
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
-          <Box sx={{ mt: 4, p: 3, borderRadius: 3, backgroundColor: 'background.alt' }}>
-            <Typography variant="h6" fontWeight={600} sx={{ mb: 3 }}>
-              Actions rapides
-            </Typography>
-
-            <Grid container spacing={2}>
-              {(user.role === 'company' || user.role === 'admin') && (
-                <>
-                  <Grid item xs={6} sm={3}>
-                    <Button
-                      variant="gradient"
-                      size="large"
-                      onClick={() => navigate('/survey-builder')}
-                      icon={<Plus size={20} />}
-                      fullWidth
-                    >
-                      Nouveau Sondage
-                    </Button>
-                  </Grid>
-
-                  <Grid item xs={6} sm={3}>
-                    <Button
-                      variant="outlined"
-                      size="large"
-                      onClick={() => navigate('/surveys')}
-                      icon={<Eye size={20} />}
-                      fullWidth
-                    >
-                      Voir Sondages
-                    </Button>
-                  </Grid>
-                </>
-              )}
-
-              {user.role === 'merchant' && (
-                <Grid item xs={6} sm={3}>
-                  <Button
-                    variant="gradient"
-                    size="large"
-                    onClick={() => navigate('/surveys')}
-                    icon={<FileText size={20} />}
-                    fullWidth
-                  >
-                    Sondages Disponibles
-                  </Button>
-                </Grid>
-              )}
-
-              <Grid item xs={6} sm={3}>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  onClick={handleLogout}
-                  icon={<Settings size={20} />}
-                  fullWidth
-                >
-                  Déconnexion
-                </Button>
-              </Grid>
-            </Grid>
-          </Box>
-        </motion.div>
       </Box>
     </Container>
   );

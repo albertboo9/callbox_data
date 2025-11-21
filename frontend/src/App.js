@@ -19,7 +19,12 @@ import { ToastContainer } from './components/ui/Toast';
 import './App.css';
 
 function AppContent() {
-  const [user, setUser] = useState(null);
+  // Initialize user from localStorage immediately
+  const [user, setUser] = useState(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    return token && userData ? JSON.parse(userData) : null;
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,13 +36,6 @@ function AppContent() {
       offset: 50,
       delay: 100,
     });
-
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-    }
   }, []);
 
   const handleLogout = () => {
