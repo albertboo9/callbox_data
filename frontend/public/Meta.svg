@@ -1,0 +1,44 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="200" cy="150" r="100" fill="rgba(255,255,255,0.1)" filter="blur(40px)"/>
+  <circle cx="1000" cy="480" r="80" fill="rgba(255,255,255,0.1)" filter="blur(30px)"/>
+  <circle cx="1100" cy="200" r="60" fill="rgba(255,255,255,0.05)" filter="blur(20px)"/>
+
+  <!-- Logo background -->
+  <rect x="540" y="255" width="120" height="120" rx="20" fill="rgba(255,255,255,0.2)" filter="blur(1px)"/>
+  <rect x="545" y="260" width="110" height="110" rx="15" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+
+  <!-- Logo icon (simplified) -->
+  <rect x="575" y="285" width="50" height="60" rx="5" fill="white"/>
+  <rect x="580" y="290" width="40" height="6" rx="3" fill="#6366f1"/>
+  <rect x="580" y="300" width="30" height="6" rx="3" fill="#6366f1"/>
+  <rect x="580" y="310" width="35" height="6" rx="3" fill="#6366f1"/>
+  <rect x="580" y="320" width="25" height="6" rx="3" fill="#6366f1"/>
+  <circle cx="600" cy="340" r="8" fill="#6366f1"/>
+
+  <!-- Title -->
+  <text x="600" y="420" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="48" font-weight="800">
+    CallBoxData
+  </text>
+
+  <!-- Subtitle -->
+  <text x="600" y="460" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="400" opacity="0.9">
+    Révolutionnez Votre Collecte de Données
+  </text>
+
+  <!-- Tagline -->
+  <text x="600" y="490" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="300" opacity="0.8">
+    Plateforme moderne de sondage avec analyses avancées
+  </text>
+</svg>

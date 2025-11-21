@@ -30,16 +30,16 @@
       "purpose": "any maskable"
     },
     {
-      "src": "Meta.png",
-      "type": "image/png",
+      "src": "Meta.svg",
+      "type": "image/svg+xml",
       "sizes": "1200x630",
       "purpose": "any"
     }
   ],
   "screenshots": [
     {
-      "src": "Meta.png",
-      "type": "image/png",
+      "src": "Meta.svg",
+      "type": "image/svg+xml",
       "sizes": "1200x630",
       "form_factor": "wide"
     }
